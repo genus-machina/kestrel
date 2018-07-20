@@ -4,13 +4,19 @@ astral = Astral()
 location = astral["Raleigh"]
 
 
-def is_after(start):
-    return lambda datetime: datetime > start
+def after_time(start):
+    return lambda datetime: datetime.time() > start
 
-def is_before(end):
-    return lambda datetime: datetime < end
+def all_of(*filters):
+    return lambda value: all(map(lambda filter: filter(value), filters))
 
-def is_night(datetime):
+def before_time(end):
+    return lambda datetime: datetime.time() < end
+
+def night(datetime):
     date = datetime.date()
     (dawn, dusk) = location.daylight(date=date, local=False)
     return datetime < dawn or datetime > dusk
+
+def some_of(*filters):
+    return lambda value: any(map(lambda filter: filter(value), filters))
