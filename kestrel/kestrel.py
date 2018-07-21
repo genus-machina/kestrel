@@ -15,14 +15,14 @@ logging.basicConfig(
 def log_sensor_activity(action="done something", sensor="a device"):
     logging.info("%s sensor has %s", sensor, action)
 
-# device definitions
+logging.info("Initializing devices...")
 
 northeast_lamp = LED(2, active_high=False)
 southeast_lamp = LED(3, active_high=False)
 northeast_sensor = MotionSensor(14)
 southeast_sensor = MotionSensor(15)
 
-# reactive handlers
+logging.info("Setting up device handlers...")
 
 northeast_sensor.when_motion = partial(
     log_sensor_activity,
@@ -41,7 +41,7 @@ southeast_sensor.when_no_motion = partial(
     sensor="southeast", action="deactivated"
 )
 
-# scheduled handers
+logging.info("Setting up scheduled handlers...")
 
 def handle_dawn():
     def handler():
@@ -80,7 +80,5 @@ handle_dusk()
 handle_morning()
 handle_night()
 
-# run
-
-logging.info("kestrel has started")
+logging.info("kestrel has started.")
 pause()

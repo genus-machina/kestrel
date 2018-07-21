@@ -34,8 +34,21 @@ class TimersTest(TestCase):
         Timer.return_value.start.assert_called_once_with()
 
     @freeze_time("2018-07-19 19:30:00")
-    def test_next_before(self):
+    def test_next_before_default(self):
         next = timers.next(time(20, 0, 0, tzinfo=timezone.utc))
+        expected = datetime(
+            2018, 7, 20, 20, 0, 0,
+            tzinfo=timezone.utc
+        )
+        self.assertEqual(next, expected)
+
+    @freeze_time("2018-07-19 19:30:00")
+    def test_next_before_minimum(self):
+        minimum = timedelta(minutes=5)
+        next = timers.next(
+            time(20, 0, 0, tzinfo=timezone.utc),
+            minimum=minimum
+        )
         expected = datetime(
             2018, 7, 19, 20, 0, 0,
             tzinfo=timezone.utc
@@ -81,20 +94,32 @@ class TimersTest(TestCase):
 
     @freeze_time()
     @patch("kestrel.timers.at")
+    @patch("kestrel.timers.fuzz")
     @patch("kestrel.timers.next")
-    def test_at_morning(self, next, at):
+    def test_at_morning(self, next, fuzz, at):
         handler = MagicMock()
         timers.at_morning(handler)
         next.assert_called_once_with(timers.MORNING)
-        at.assert_called_once_with(next.return_value, handler)
+        fuzz.assert_called_once_with(next.return_value, timers.DEFAULT_FUZZ)
+        at.assert_called_once_with(fuzz.return_value, handler)
         handler.assert_not_called()
 
     @freeze_time()
     @patch("kestrel.timers.at")
+    @patch("kestrel.timers.fuzz")
     @patch("kestrel.timers.next")
-    def test_at_night(self, next, at):
+    def test_at_night(self, next, fuzz, at):
         handler = MagicMock()
         timers.at_night(handler)
         next.assert_called_once_with(timers.NIGHT)
-        at.assert_called_once_with(next.return_value, handler)
+        fuzz.assert_called_once_with(next.return_value, timers.DEFAULT_FUZZ)
+        at.assert_called_once_with(fuzz.return_value, handler)
         handler.assert_not_called()
+
+    def test_fuzz(self):
+        fuzz = timedelta(minutes=15)
+        origin = datetime.now(timezone.utc)
+        fuzzed = timers.fuzz(origin, fuzz)
+        self.assertNotEqual(origin, fuzzed)
+        self.assertGreaterEqual(fuzzed, origin - fuzz)
+        self.assertLessEqual(fuzzed, origin + fuzz)
