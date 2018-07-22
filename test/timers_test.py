@@ -123,3 +123,17 @@ class TimersTest(TestCase):
         self.assertNotEqual(origin, fuzzed)
         self.assertGreaterEqual(fuzzed, origin - fuzz)
         self.assertLessEqual(fuzzed, origin + fuzz)
+
+    def test_always(self):
+        condition = MagicMock()
+        handler = MagicMock()
+        timers.always(condition, handler)
+        self.assertEqual(condition.call_count, 1)
+        ((wrapper,), _) = condition.call_args
+        self.assertTrue(callable(wrapper))
+        handler.assert_not_called()
+        wrapper()
+        handler.assert_called_once_with()
+        self.assertEqual(condition.call_count, 2)
+        ((wrapper,), _) = condition.call_args
+        self.assertTrue(callable(wrapper))

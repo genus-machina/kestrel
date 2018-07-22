@@ -7,6 +7,12 @@ import threading
 def after(delay, handler):
     threading.Timer(delay.total_seconds(), handler).start()
 
+def always(when, handler):
+    def wrapper():
+        handler()
+        when(wrapper)
+    when(wrapper)
+
 def at(when, handler):
     now = datetime.now(timezone.utc)
     delay = when - now

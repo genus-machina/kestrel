@@ -3,8 +3,8 @@ from datetime import time
 from functools import partial
 from gpiozero import LED, MotionSensor
 from signal import pause
+from timers import always, at_dawn, at_dusk, at_morning, at_night
 
-import timers
 
 import logging
 logging.basicConfig(
@@ -44,41 +44,29 @@ southeast_sensor.when_no_motion = partial(
 logging.info("Setting up scheduled handlers...")
 
 def handle_dawn():
-    def handler():
-        logging.info("DAWN")
-        northeast_lamp.off()
-        southeast_lamp.off()
-        handle_dawn()
-    timers.at_dawn(handler)
+    logging.info("DAWN")
+    northeast_lamp.off()
+    southeast_lamp.off()
 
 def handle_dusk():
-    def handler():
-        logging.info("DUSK")
-        northeast_lamp.on()
-        southeast_lamp.on()
-        handle_dusk()
-    timers.at_dusk(handler)
+    logging.info("DUSK")
+    northeast_lamp.on()
+    southeast_lamp.on()
 
 def handle_morning():
-    def handler():
-        logging.info("MORNING")
-        northeast_lamp.on()
-        southeast_lamp.on()
-        handle_morning()
-    timers.at_morning(handler)
+    logging.info("MORNING")
+    northeast_lamp.on()
+    southeast_lamp.on()
 
 def handle_night():
-    def handler():
-        logging.info("NIGHT")
-        northeast_lamp.off()
-        southeast_lamp.off()
-        handle_night()
-    timers.at_night(handler)
+    logging.info("NIGHT")
+    northeast_lamp.off()
+    southeast_lamp.off()
 
-handle_dawn()
-handle_dusk()
-handle_morning()
-handle_night()
+always(at_dawn, handle_dawn)
+always(at_dusk, handle_dusk)
+always(at_morning, handle_morning)
+always(at_night, handle_night)
 
 logging.info("kestrel has started.")
 pause()
