@@ -1,6 +1,6 @@
 .PHONY:
 lint:
-	flake8 bin/ src/ test/
+	flake8 kestrel/ test/
 
 .PHONY:
 start:

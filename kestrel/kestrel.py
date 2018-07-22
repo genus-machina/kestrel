@@ -1,19 +1,15 @@
 #!/usr/bin/env python
-from datetime import time
 from functools import partial
 from gpiozero import LED, MotionSensor
+from handlers import do, turn_lamp_off, turn_lamp_on
 from signal import pause
 from timers import always, at_dawn, at_dusk, at_morning, at_night
-
 
 import logging
 logging.basicConfig(
     format="%(levelname)s: %(message)s",
     level=logging.INFO
 )
-
-def log_sensor_activity(action="done something", sensor="a device"):
-    logging.info("%s sensor has %s", sensor, action)
 
 logging.info("Initializing devices...")
 
@@ -25,48 +21,55 @@ southeast_sensor = MotionSensor(15)
 logging.info("Setting up device handlers...")
 
 northeast_sensor.when_motion = partial(
-    log_sensor_activity,
-    sensor="northeast", action="activated"
+    logging.info,
+    "northeast sensor has activated"
 )
 northeast_sensor.when_no_motion = partial(
-    log_sensor_activity,
-    sensor="northeast", action="deactivated"
+    logging.info,
+    "northeast sensor has deactivated"
 )
 southeast_sensor.when_motion = partial(
-    log_sensor_activity,
-    sensor="southeast", action="activated"
+    logging.info,
+    "southeast sensor has activated"
 )
 southeast_sensor.when_no_motion = partial(
-    log_sensor_activity,
-    sensor="southeast", action="deactivated"
+    logging.info,
+    "southeast sensor has deactivated"
 )
 
 logging.info("Setting up scheduled handlers...")
 
-def handle_dawn():
-    logging.info("DAWN")
-    northeast_lamp.off()
-    southeast_lamp.off()
+always(
+    at_dawn, do(
+        partial(logging.info, "DAWN"),
+        turn_lamp_off(northeast_lamp),
+        turn_lamp_off(southeast_lamp)
+    )
+)
 
-def handle_dusk():
-    logging.info("DUSK")
-    northeast_lamp.on()
-    southeast_lamp.on()
+always(
+    at_dusk, do(
+        partial(logging.info, "DUSK"),
+        turn_lamp_on(northeast_lamp),
+        turn_lamp_on(southeast_lamp)
+    )
+)
 
-def handle_morning():
-    logging.info("MORNING")
-    northeast_lamp.on()
-    southeast_lamp.on()
+always(
+    at_morning, do(
+        partial(logging.info, "MORNING"),
+        turn_lamp_on(northeast_lamp),
+        turn_lamp_on(southeast_lamp)
+    )
+)
 
-def handle_night():
-    logging.info("NIGHT")
-    northeast_lamp.off()
-    southeast_lamp.off()
-
-always(at_dawn, handle_dawn)
-always(at_dusk, handle_dusk)
-always(at_morning, handle_morning)
-always(at_night, handle_night)
+always(
+    at_night, do(
+        partial(logging.info, "NIGHT"),
+        turn_lamp_off(northeast_lamp),
+        turn_lamp_off(southeast_lamp)
+    )
+)
 
 logging.info("kestrel has started.")
 pause()

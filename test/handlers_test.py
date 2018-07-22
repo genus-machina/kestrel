@@ -46,3 +46,13 @@ class HandlersTest(TestCase):
         handler.assert_not_called()
         when(True)
         handler.assert_called_once_with()
+
+    def test_do(self):
+        handler1 = MagicMock()
+        handler2 = MagicMock()
+        wrapper = handlers.do(handler1, handler2)
+        handler1.assert_not_called()
+        handler2.assert_not_called()
+        wrapper()
+        handler1.assert_called_once_with()
+        handler2.assert_called_once_with()
