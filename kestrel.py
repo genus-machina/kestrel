@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 from functools import partial
 from gpiozero import LED, MotionSensor
-from handlers import do, turn_lamp_off, turn_lamp_on
+from talons.handlers import do, turn_lamp_off, turn_lamp_on
 from signal import pause
-from timers import always, at_dawn, at_dusk, at_morning, at_night
+from talons.timers import always, at_dawn, at_dusk, at_morning, at_night
 
 import logging
 logging.basicConfig(

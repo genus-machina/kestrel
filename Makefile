@@ -1,11 +1,10 @@
-.PHONY:
-lint:
-	flake8 kestrel/ test/
+env:
+	virtualenv env
+	./env/bin/pip install -r requirements.txt
 
 .PHONY:
-start:
-	python bin/kestrel.py
+lint: env
+	./env/bin/python -m flake8 *.py
 
 .PHONY:
 test: lint
-	python -m pytest
