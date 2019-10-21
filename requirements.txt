@@ -10,4 +10,4 @@ pyflakes==1.6.0
 pytz==2018.5
 requests==2.19.1
 -e git+https://github.com/genus-machina/talons.git@c5627c9fc7bbe4dea6f8262ecc78312be9640b3f#egg=talons
-urllib3==1.23
+urllib3==1.24.2
